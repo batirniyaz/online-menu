@@ -11,6 +11,7 @@ from app.crud.sub_category import (
 
 from app.auth.database import get_async_session
 from app.schemas.sub_category import SubCategoryCreate, SubCategoryResponse, SubCategoryUpdate
+from fastapi_cache.decorator import cache
 
 router = APIRouter()
 
@@ -24,6 +25,7 @@ async def create_sub_category_endpoint(
 
 
 @router.get("/")
+@cache(expire=60)
 async def get_sub_categories_endpoint(
         db: AsyncSession = Depends(get_async_session)
 ):
@@ -31,6 +33,7 @@ async def get_sub_categories_endpoint(
 
 
 @router.get("/{sub_category_id}")
+@cache(expire=60)
 async def get_sub_category_endpoint(
         sub_category_id: int,
         db: AsyncSession = Depends(get_async_session)

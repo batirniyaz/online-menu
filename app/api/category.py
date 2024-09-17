@@ -1,4 +1,7 @@
+import time
+
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi_cache.decorator import cache
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.crud.category import (
@@ -21,12 +24,13 @@ async def create_category_endpoint(category: CategoryCreate, db: AsyncSession = 
 
 
 @router.get("/")
+@cache(expire=60)
 async def get_categories_endpoint(db: AsyncSession = Depends(get_async_session)):
-
     return await get_categories(db)
 
 
 @router.get("/{category_id}")
+@cache(expire=60)
 async def get_category_endpoint(category_id: int, db: AsyncSession = Depends(get_async_session)):
 
     return await get_category(db, category_id)

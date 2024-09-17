@@ -3,7 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.database import get_async_session
 
 from app.crud.product import create_product, get_products, get_product, update_product, delete_product
-from app.schemas.product import ProductCreate, ProductResponse
+from app.schemas.product import ProductCreate, ProductResponse, ProductUpdate
+from fastapi_cache.decorator import cache
 
 router = APIRouter()
 
@@ -32,6 +33,7 @@ async def create_product_endpoint(
 
 
 @router.get("/")
+@cache(expire=60)
 async def get_products_endpoint(
         db: AsyncSession = Depends(get_async_session)
 ):
@@ -39,6 +41,7 @@ async def get_products_endpoint(
 
 
 @router.get("/{product_id}")
+@cache(expire=60)
 async def get_product_endpoint(product_id: int, db: AsyncSession = Depends(get_async_session)):
     return await get_product(db, product_id)
 
@@ -55,7 +58,7 @@ async def update_product_endpoint(
         image: UploadFile = File(None),
         db: AsyncSession = Depends(get_async_session)
 ):
-    product = ProductCreate(
+    product = ProductUpdate(
         name=name,
         price=price,
         description=description,
