@@ -1,7 +1,7 @@
 import datetime
 
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
 from app.schemas.sub_category import SubCategoryResponse
 
@@ -22,7 +22,7 @@ class CategoryUpdate(CategoryBase):
 
 class CategoryResponse(CategoryBase):
     id: int = Field(..., description="The ID of the category")
-    sub_categories: Optional[list[SubCategoryResponse]] = Field([],
+    sub_categories: Optional[List[SubCategoryResponse]] = Field([],
                                                                 description="A list of sub categories associated with the category")
 
     created_at: datetime.datetime = Field(..., description="The time the category was created")

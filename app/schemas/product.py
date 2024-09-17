@@ -2,7 +2,7 @@ import datetime
 
 from fastapi import UploadFile, File
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, List
 
 from app.schemas.option import OptionResponse
 
@@ -33,7 +33,7 @@ class ProductUpdate(ProductBase):
 class ProductResponse(ProductBase):
     id: int = Field(..., description="The ID of the product")
     image: Optional[str] = Field(None, description="The image URL of the product")
-    options: Optional[list[OptionResponse]] = Field(None, description="The options of the product")
+    options: Optional[List[OptionResponse]] = Field(None, description="The options of the product")
 
     created_at: datetime.datetime = Field(..., description="The time the product was created")
     updated_at: datetime.datetime = Field(..., description="The time the product was updated")
