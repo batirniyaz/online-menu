@@ -4,16 +4,20 @@ from fastapi import FastAPI
 
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_cache import FastAPICache
 
 from app.auth.base_config import router as auth_router
 from app.auth.database import create_db_and_tables
 
 from app.api import router
+from app.cache.in_memory_cache import InMemoryCacheBackend
 
 
 @asynccontextmanager
 async def lifespan(main_app: FastAPI):
     await create_db_and_tables()
+
+    FastAPICache.init(InMemoryCacheBackend(), prefix="niagara-menu-cache")
 
     yield
 
