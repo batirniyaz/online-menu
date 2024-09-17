@@ -25,10 +25,7 @@ async def get_options(db: AsyncSession):
     result = await db.execute(select(Option))
     options = result.scalars().all()
 
-    if not options:
-        raise HTTPException(status_code=404, detail="Options not found")
-
-    return options
+    return options if options else []
 
 
 async def get_option(db: AsyncSession, option_id: int):

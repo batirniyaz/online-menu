@@ -5,6 +5,7 @@ from sqlalchemy.future import select
 
 from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryUpdate
+from app.config import BASE_URL
 
 
 async def create_category(db: AsyncSession, category: CategoryCreate):
@@ -24,8 +25,10 @@ async def get_categories(db: AsyncSession):
     result = await db.execute(select(Category))
     categories = result.scalars().all()
 
-    if not categories:
-        raise HTTPException(status_code=404, detail="Categories not found")
+    for category in categories:
+        for sub_category in category.sub_categories:
+            for product in sub_category.products:
+                product.image = f"{BASE_URL}{product.image}"
 
     return categories
 
@@ -37,6 +40,13 @@ async def get_category(db: AsyncSession, category_id: int):
     if db_category is None:
         raise HTTPException(status_code=404, detail="Category not found")
 
+    products = []
+    for sub_category in db_category.sub_categories:
+        for product in sub_category.products:
+            product.image = f"{BASE_URL}{product.image}"
+            products.append(product)
+
+    db_category.products = products
     return db_category
 
 

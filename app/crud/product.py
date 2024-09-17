@@ -21,7 +21,7 @@ async def create_product(db: AsyncSession, product: ProductCreate, image: Upload
         await db.commit()
         await db.refresh(db_product)
 
-        db_product.image = f"{BASE_URL}{db_product.image}"
+        # db_product.image = f"{BASE_URL}{db_product.image}"
 
         return db_product
     except Exception as e:
@@ -32,9 +32,6 @@ async def create_product(db: AsyncSession, product: ProductCreate, image: Upload
 async def get_products(db: AsyncSession):
     result = await db.execute(select(Product))
     products = result.scalars().all()
-
-    if not products:
-        raise HTTPException(status_code=404, detail="Products not found")
 
     for product in products:
         product.image = f"{BASE_URL}{product.image}"
@@ -49,7 +46,8 @@ async def get_product(db: AsyncSession, product_id: int):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
-    product.image = f"{BASE_URL}{product.image}"
+    formated_image = f"{BASE_URL}{product.image}"
+    product.image = formated_image
 
     return product
 
@@ -60,7 +58,7 @@ async def update_product(db: AsyncSession, product_id: int, product: ProductUpda
     for key, value in product.model_dump().items():
         setattr(db_product, key, value)
 
-    BASE_URL, main_image_url, file_path = save_upload_file(image)
+    main_image_url, file_path = save_upload_file(image)
 
     if image:
         image_url = f"{main_image_url}{file_path}"
@@ -69,7 +67,8 @@ async def update_product(db: AsyncSession, product_id: int, product: ProductUpda
     await db.commit()
     await db.refresh(db_product)
 
-    db_product.image = f"{BASE_URL}{db_product.image}"
+    formated_image = f"{BASE_URL}{db_product.image}"
+    db_product.image = formated_image
 
     return db_product
 
