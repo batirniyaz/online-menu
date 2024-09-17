@@ -10,6 +10,7 @@ from app.models.category import Category
 from app.models.sub_category import SubCategory
 from app.models.product import Product
 from app.models.option import Option
+from app.models.order import Order
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
