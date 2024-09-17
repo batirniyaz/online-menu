@@ -1,17 +1,18 @@
 import datetime
-from uuid import uuid4 as uuid
+from uuid import uuid4 as generate_uuid
 
 from pydantic import BaseModel, Field
 from typing import List, Dict
+import uuid as uuid_module
 
 
 class OrderCreate(BaseModel):
-    products: List[Dict] = Field([], description="The products of the order")
+    products: List[Dict] = Field([{"product_id": 3, "quantity": 4}, {"product_id": 4, "quantity": 3}], description="The products of the order")
 
 
 class OrderResponse(OrderCreate):
     id: int = Field(..., description="The ID of the order")
-    uuid: uuid = Field(..., description="The UUID of the order")
+    uuid: uuid_module.UUID = Field(..., description="The UUID of the order")
 
     created_at: datetime.datetime = Field(..., description="The time the order was created")
     updated_at: datetime.datetime = Field(..., description="The time the order was updated")
@@ -19,6 +20,7 @@ class OrderResponse(OrderCreate):
     class Config:
         from_attributes = True
         validate_assignment = True
+        arbitrary_types_allowed = True
         json_schema_extra = {
             "example": {
                 "id": 1,
