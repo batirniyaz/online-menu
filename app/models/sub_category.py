@@ -11,7 +11,7 @@ class SubCategory(Base):
     __tablename__ = "sub_category"
 
     id: Mapped[int]= mapped_column(Integer, unique=True, index=True, nullable=False, primary_key=True)
-    name: Mapped[str] = mapped_column(String(length=255), nullable=False)
+    name: Mapped[str] = mapped_column(String(length=255), nullable=False, unique=True)
     sort_order: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     category_id: Mapped[int] = mapped_column(ForeignKey("category.id"), nullable=False)
     products: Mapped[List["Product"]] = relationship(back_populates="sub_category", lazy="selectin")

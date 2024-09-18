@@ -11,7 +11,7 @@ class Product(Base):
     __tablename__ = "product"
 
     id: Mapped[int] = mapped_column(Integer, unique=True, index=True, nullable=False, primary_key=True)
-    name: Mapped[str] = mapped_column(String(length=255), nullable=False)
+    name: Mapped[str] = mapped_column(String(length=255), nullable=False, unique=True)
     description: Mapped[str] = mapped_column(String(length=255), nullable=True)
     price: Mapped[int] = mapped_column(Integer, nullable=True)
     status: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
