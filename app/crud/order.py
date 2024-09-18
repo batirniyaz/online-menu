@@ -8,6 +8,7 @@ from app.models.order import Order
 from app.schemas.order import OrderCreate
 from app.crud.product import get_product
 from app.crud.sub_category import get_sub_category
+from app.crud.category import get_category
 
 
 async def create_order(db: AsyncSession, order: OrderCreate):
@@ -16,10 +17,12 @@ async def create_order(db: AsyncSession, order: OrderCreate):
         for product in order.products:
             db_product = await get_product(db, product["product_id"])
             sub_category = await get_sub_category(db, db_product.sub_category_id)
+            category = await get_category(db, sub_category.category_id)
             sub_category_dict = {
                 "sub_category_id": sub_category.id,
                 "sub_category_name": sub_category.name,
                 "category_id": sub_category.category_id,
+                "category_name": category.name,
             }
             products.append(
                 {
