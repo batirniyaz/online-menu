@@ -28,3 +28,10 @@ class UserUpdate(schemas.BaseUserUpdate):
     is_active: Optional[bool] = None
     is_superuser: Optional[bool] = None
     is_verified: Optional[bool] = None
+
+
+class UserAdminUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    is_active: Optional[bool] = None
+    is_superuser: Optional[bool] = None
+    is_verified: Optional[bool] = None
