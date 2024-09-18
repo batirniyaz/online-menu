@@ -27,7 +27,6 @@ class ProductUpdate(ProductBase):
     status: Optional[bool] = Field(None, description="The status of the product")
     sort_order: Optional[int] = Field(None, description="The sort order of the product")
     sub_category_id: Optional[int] = Field(None, description="The sub category ID of the product")
-    image: Optional[UploadFile] = File(None, description="The image of the product")
 
 
 class ProductResponse(ProductBase):
