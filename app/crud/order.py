@@ -7,6 +7,7 @@ from sqlalchemy.future import select
 from app.models.order import Order
 from app.schemas.order import OrderCreate
 from app.crud.product import get_product
+from app.crud.sub_category import get_sub_category
 
 
 async def create_order(db: AsyncSession, order: OrderCreate):
@@ -14,6 +15,12 @@ async def create_order(db: AsyncSession, order: OrderCreate):
         products = []
         for product in order.products:
             db_product = await get_product(db, product["product_id"])
+            sub_category = await get_sub_category(db, db_product.sub_category_id)
+            sub_category_dict = {
+                "sub_category_id": sub_category.id,
+                "sub_category_name": sub_category.name,
+                "category_id": sub_category.category_id,
+            }
             products.append(
                 {
                     "product_id": db_product.id,
@@ -21,6 +28,7 @@ async def create_order(db: AsyncSession, order: OrderCreate):
                     "product_status": db_product.status,
                     "quantity": product["quantity"],
                     "price": db_product.price,
+                    "sub_category": sub_category_dict,
                 }
             )
 
