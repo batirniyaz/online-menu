@@ -7,6 +7,7 @@ from app.utils.file_utils import save_upload_file
 from app.models.product import Product
 from app.schemas.product import ProductCreate, ProductUpdate
 from app.config import BASE_URL
+from app.models.sub_category import SubCategory
 
 
 async def create_product(db: AsyncSession, product: ProductCreate, image: UploadFile):
@@ -14,6 +15,12 @@ async def create_product(db: AsyncSession, product: ProductCreate, image: Upload
 
         main_image_url, file_path = save_upload_file(image)
         image_url = f"{main_image_url}{file_path}"
+
+        res_sub_category = await db.execute(select(SubCategory).filter_by(id=product.sub_category_id))
+        sub_category = res_sub_category.scalars().first()
+
+        if not sub_category:
+            raise HTTPException(status_code=404, detail="SubCategory for this product not found")
 
         db_product = Product(**product.model_dump(), image=image_url, options=[])
 
@@ -53,7 +60,11 @@ async def get_product(db: AsyncSession, product_id: int):
 
 
 async def update_product(db: AsyncSession, product_id: int, product: ProductUpdate, image: UploadFile):
-    db_product = await get_product(db, product_id)
+    res_db_product = await db.execute(select(Product).filter_by(id=product_id))
+    db_product = res_db_product.scalars().first()
+
+    if not db_product:
+        raise HTTPException(status_code=404, detail="Product not found")
 
     for key, value in product.model_dump().items():
         setattr(db_product, key, value)
