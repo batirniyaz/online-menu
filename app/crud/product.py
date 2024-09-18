@@ -1,3 +1,5 @@
+from typing import Union, Optional
+
 from fastapi import HTTPException, UploadFile
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -59,7 +61,7 @@ async def get_product(db: AsyncSession, product_id: int):
     return product
 
 
-async def update_product(db: AsyncSession, product_id: int, product: ProductUpdate, image: UploadFile):
+async def update_product(db: AsyncSession, product_id: int, product: ProductUpdate, image: Optional[UploadFile] | str):
     res_db_product = await db.execute(select(Product).filter_by(id=product_id))
     db_product = res_db_product.scalars().first()
 
@@ -67,11 +69,11 @@ async def update_product(db: AsyncSession, product_id: int, product: ProductUpda
         raise HTTPException(status_code=404, detail="Product not found")
 
     for key, value in product.model_dump().items():
-        setattr(db_product, key, value)
-
-    main_image_url, file_path = save_upload_file(image)
+        if value is not None:
+            setattr(db_product, key, value)
 
     if image:
+        main_image_url, file_path = save_upload_file(image)
         image_url = f"{main_image_url}{file_path}"
         db_product.image = image_url
 
