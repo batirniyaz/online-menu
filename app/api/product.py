@@ -13,12 +13,12 @@ router = APIRouter()
 
 @router.post("/", response_model=ProductResponse)
 async def create_product_endpoint(
-        name: str = Query(...),
-        price: float = Query(...),
-        description: str = Query(...),
-        status: bool = Query(...),
-        sort_order: int = Query(...),
-        sub_category_id: int = Query(...),
+        name: str = Form(...),
+        price: float = Form(...),
+        description: str = Form(...),
+        status: bool = Form(...),
+        sort_order: int = Form(...),
+        sub_category_id: int = Form(...),
         image: UploadFile = File(...),
         db: AsyncSession = Depends(get_async_session)
 ):
