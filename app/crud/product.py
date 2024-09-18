@@ -61,7 +61,7 @@ async def get_product(db: AsyncSession, product_id: int):
     return product
 
 
-async def update_product(db: AsyncSession, product_id: int, product: ProductUpdate, image: Optional[UploadFile] | str):
+async def update_product(db: AsyncSession, product_id: int, product: ProductUpdate, image: Union[Optional[UploadFile], str]):
     res_db_product = await db.execute(select(Product).filter_by(id=product_id))
     db_product = res_db_product.scalars().first()
 

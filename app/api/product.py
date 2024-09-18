@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form, File, Query
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -57,7 +57,7 @@ async def update_product_endpoint(
         status: Optional[bool] = Form(None),
         sort_order: Optional[int] = Form(None),
         sub_category_id: Optional[int] = Form(None),
-        image: Optional[UploadFile] | str = File(None),
+        image: Union[Optional[UploadFile], str] = File(None),
         db: AsyncSession = Depends(get_async_session)
 ):
     product = ProductUpdate(
