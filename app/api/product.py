@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, Form, File, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.database import get_async_session
@@ -49,13 +51,13 @@ async def get_product_endpoint(product_id: int, db: AsyncSession = Depends(get_a
 @router.put("/{product_id}", response_model=ProductResponse)
 async def update_product_endpoint(
         product_id: int,
-        name: str = Query(None),
-        price: float = Query(None),
-        description: str = Query(None),
-        status: bool = Query(None),
-        sort_order: int = Query(None),
-        sub_category_id: int = Query(None),
-        image: UploadFile = File(None),
+        name: Optional[str] = Form(None),
+        price: Optional[int] = Form(None),
+        description: Optional[str] = Form(None),
+        status: Optional[bool] = Form(None),
+        sort_order: Optional[int] = Form(None),
+        sub_category_id: Optional[int] = Form(None),
+        image: Optional[UploadFile] | str = File(None),
         db: AsyncSession = Depends(get_async_session)
 ):
     product = ProductUpdate(
