@@ -1,13 +1,15 @@
+from typing import List
+
 from fastapi_users import FastAPIUsers
 from fastapi_users.authentication import BearerTransport, JWTStrategy, AuthenticationBackend
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Path
 from sqlalchemy.future import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi.responses import JSONResponse
 
 from app.auth.database import User, get_async_session
 from app.auth.manager import get_user_manager
-from app.auth.schemas import UserRead, UserCreate
+from app.auth.schemas import UserRead, UserCreate, UserAdminUpdate
 from app.config import SECRET_KEY
 
 bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
@@ -48,9 +50,54 @@ router.include_router(
 router_def = APIRouter()
 
 
-@router_def.delete("/delete")
-async def delete_user(db: AsyncSession = Depends(get_async_session), user: User = Depends(current_active_user)):
-    res = await db.execute(select(User).filter_by(id=user.id))
+@router_def.get("/users", response_model=List[UserRead])
+async def get_all_users(
+        db: AsyncSession = Depends(get_async_session),
+        current_user: User = Depends(current_active_user)
+):
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+
+    res = await db.execute(select(User))
+    users = res.scalars().all()
+    return users
+
+
+@router_def.put("/update/{user_id}", response_model=UserRead)
+async def update_user(
+    user_update: UserAdminUpdate,
+    user_id: int = Path(..., description="The ID of the user to update"),
+    db: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(current_active_user)
+):
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+
+    res = await db.execute(select(User).filter_by(id=user_id))
+    db_user = res.scalars().first()
+    if not db_user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
+
+    for key, value in user_update.dict(exclude_unset=True).items():
+        setattr(db_user, key, value)
+
+    db.add(db_user)
+    await db.commit()
+    await db.refresh(db_user)
+
+    return db_user
+
+
+@router_def.delete("/delete/{user_id}")
+async def delete_user(
+        user_id: int = Path(..., description="The ID of the user to delete"),
+        db: AsyncSession = Depends(get_async_session),
+        current_user: User = Depends(current_active_user)
+):
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+
+    res = await db.execute(select(User).filter_by(id=user_id))
     db_user = res.scalars().first()
     if not db_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
