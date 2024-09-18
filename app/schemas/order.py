@@ -7,7 +7,10 @@ import uuid as uuid_module
 
 
 class OrderCreate(BaseModel):
-    products: List[Dict] = Field([{"product_id": 3, "quantity": 4}, {"product_id": 4, "quantity": 3}], description="The products of the order")
+    products: List[Dict] = Field([
+        {"product_id": 3 or None, "option_id": 2 or None, "quantity": 4},
+        {"product_id": 4 or None, "option_id": 2 or None, "quantity": 3}],
+        description="The products of the order")
 
 
 class OrderResponse(OrderCreate):
@@ -25,7 +28,7 @@ class OrderResponse(OrderCreate):
             "example": {
                 "id": 1,
                 "uuid": "123e4567-e89b-12d3-a456-426614174000",
-                "products": [{"product_id": 1, "quantity": 1}],
+                "products": [{"product_id": 1, "option_id": 2, "quantity": 1}],
                 "created_at": "2022-01-01T12:00:00",
                 "updated_at": "2022-01-01T12:00:00"
             }
