@@ -63,6 +63,22 @@ async def get_all_users(
     return users
 
 
+@router_def.get("/user/{user_id}", response_model=UserRead)
+async def get_user(
+    user_id: int = Path(..., description="The ID of the user to get"),
+    db: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(current_active_user)
+):
+    if not current_user:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized")
+
+    res = await db.execute(select(User).filter_by(id=user_id))
+    db_user = res.scalars().first()
+    if not db_user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
+    return db_user
+
+
 @router_def.put("/update/{user_id}", response_model=UserRead)
 async def update_user(
     user_update: UserAdminUpdate,
